@@ -80,7 +80,12 @@ main{
       border:0;
     
       color:#292935;
+      
     
+    }
+    .c_events .card-text{
+      color:#D3D3D3;
+
     }
     
     .card-body .c_events{
