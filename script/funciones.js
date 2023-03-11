@@ -88,12 +88,12 @@ const resaltarTexto=(clase,texto)=>{
       while (indice != -1) {
         const textoAnterior = textoTarjeta.substring(0, indice);
         const textoCoincidente = textoTarjeta.substring(indice, indice + texto.length);
-        textoResaltado += textoAnterior + `<strong>${textoCoincidente}</strong>`;
+        textoResaltado += textoAnterior + `<strong class="text-white">${textoCoincidente}</strong>`;
         textoTarjeta = textoTarjeta.substring(indice + texto.length);
         indice=textoTarjeta.toLowerCase().indexOf(texto.toLowerCase())
       }
       textoResaltado += textoTarjeta;
-      tarjeta.innerHTML = `<p class="card-text">${textoResaltado}</p>`;
+      tarjeta.innerHTML = `<p class="${clase}">${textoResaltado}</p>`;
       });
   }
 }
