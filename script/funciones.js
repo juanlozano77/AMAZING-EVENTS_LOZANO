@@ -73,41 +73,101 @@ let tildados=checkboxes.filter(checkbox=> checkbox.checked).map(checkbox=> check
 return tildados
 }
 
-const filtrarEventosPorTexto=(tarjetas,textoABuscar)=> {
-const texto = textoABuscar.toLowerCase()
-return tarjetasconTexto=tarjetas.filter(evento => evento.description.toLowerCase().includes(texto)||evento.name.toLowerCase().includes(texto))
+const filtrarEventosPorTexto=(tarjetas,arrayTexto)=> {
+  
+  const tarjetasconTexto = tarjetas.filter((evento) => {
+    const coinciden = arrayTexto.every((palabra) => {
+      return (
+        evento.description.toLowerCase().includes(palabra) ||
+        evento.name.toLowerCase().includes(palabra)
+      )
+    })
+    return coinciden;
+  })
+  return tarjetasconTexto;
+  }
+
+
+const resaltarTexto=(clase,arrayTexto)=>{ 
+  const tarjetasTexto = Array.from(document.querySelectorAll(clase));
+  tarjetasTexto.forEach(tarjeta => {
+    let resaltados = []
+    let textoTarjeta = tarjeta.textContent
+    let textoResaltado = ""
+     //obtiene los indices y el contendio de cada tarjeta
+    arrayTexto.forEach((texto) => {
+      textoTarjeta=tarjeta.textContent
+      if (texto){
+        let indiceParcial = textoTarjeta.toLowerCase().indexOf(texto)
+        let indice=indiceParcial
+        while (indiceParcial != -1) {
+          const textoCoincidente = textoTarjeta.substring(indiceParcial, indiceParcial + texto.length);
+          resaltados.push({ indice, textoCoincidente });
+          textoTarjeta = textoTarjeta.substring(indiceParcial + texto.length);
+          indice+=texto.length
+          indiceParcial=textoTarjeta.toLowerCase().indexOf(texto)
+          indice+=indiceParcial  
+          }
+      }
+      })
+      
+    let ultimoIndice = 0
+    textoTarjeta=tarjeta.textContent
+    resaltados.sort((a, b) => a.indice - b.indice)//ordena los resultados
+    console.log(resaltados)
+    console.log(tarjeta.textContent)
+  
+    
+    //filtramos aquellos que esten superpuestos
+    const resaltadosFiltrados = resaltados.filter((resaltado, i) => {
+      if (i == 0) {
+        return true;
+      }
+    
+      const anterior = resaltados[i - 1].indice + resaltados[i - 1].textoCoincidente.length;
+    
+      if (resaltado.indice + resaltado.textoCoincidente.length <= anterior) {
+        resaltado.indice = resaltados[i - 1].indice;
+        resaltado.textoCoincidente = resaltados[i - 1].textoCoincidente;
+        return false;
+      }
+
+      return true;
+    });
+
+    
+      //imprimimos la tajeta modificadas
+    resaltadosFiltrados.forEach(resaltado => {
+      const textoAnterior =textoTarjeta.substring(ultimoIndice, resaltado.indice)
+      textoResaltado += textoAnterior + `<strong class="text-white">${resaltado.textoCoincidente}</strong>`;
+      ultimoIndice = resaltado.indice + resaltado.textoCoincidente.length
+    })
+
+    textoResaltado += textoTarjeta.substring(ultimoIndice);
+    tarjeta.innerHTML = `<p class="${clase}">${textoResaltado}</p>`
+    
+
+    }
+  )
+  
 }
 
-const resaltarTexto=(clase,texto)=>{ 
-  const tarjetasTexto = Array.from(document.querySelectorAll(clase));
-  if (texto){
-      tarjetasTexto.forEach(tarjeta => {
-      let textoTarjeta = tarjeta.textContent
-      let indice = textoTarjeta.toLowerCase().indexOf(texto.toLowerCase())
-      let textoResaltado = ""
-      while (indice != -1) {
-        const textoAnterior = textoTarjeta.substring(0, indice);
-        const textoCoincidente = textoTarjeta.substring(indice, indice + texto.length);
-        textoResaltado += textoAnterior + `<strong class="text-white">${textoCoincidente}</strong>`;
-        textoTarjeta = textoTarjeta.substring(indice + texto.length);
-        indice=textoTarjeta.toLowerCase().indexOf(texto.toLowerCase())
-      }
-      textoResaltado += textoTarjeta;
-      tarjeta.innerHTML = `<p class="${clase}">${textoResaltado}</p>`;
-      });
-  }
-}
+
 
 const filtrarEventos=(eventos,textoABuscar)=> {
   const tildados = obtenerCheckboxTildados()
+  const texto = textoABuscar.trim().toLowerCase()
+  const arrayTexto = texto.split(" ");
   let tarjetasFiltradas = eventos
   if (tildados.length) {
     tarjetasFiltradas = tarjetasFiltradas.filter(evento => tildados.includes(evento.category)) 
   }
-  tarjetasFiltradas = filtrarEventosPorTexto(tarjetasFiltradas,textoABuscar)
-  imprimirTajetas(tarjetasFiltradas, container);
-  resaltarTexto(".card-text",textoABuscar)
-  resaltarTexto(".card-title",textoABuscar)
+  tarjetasFiltradas = filtrarEventosPorTexto(tarjetasFiltradas,arrayTexto)
+  if (tarjetasFiltradas){
+    imprimirTajetas(tarjetasFiltradas, container);
+    resaltarTexto(".card-text",arrayTexto)
+  resaltarTexto(".card-title",arrayTexto)
+  }
 }
 
 imprimirCategorias(categorias,checkbar)
