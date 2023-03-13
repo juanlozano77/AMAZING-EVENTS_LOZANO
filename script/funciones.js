@@ -115,38 +115,27 @@ const resaltarTexto=(clase,arrayTexto)=>{
     textoTarjeta=tarjeta.textContent
     resaltados.sort((a, b) => a.indice - b.indice)//ordena los resultados
 
-    
-    //filtramos aquellos que esten superpuestos
-    const resaltadosFiltrados = resaltados.filter((resaltado, i) => {
-      if (i == 0) {
-        return true;
+    const resaltadosFiltrados = resaltados.reduce((acc, resaltado, i) => {
+      if (i === 0) {
+        acc.push(resaltado);
+        return acc;
       }
-    
       const anterior = resaltados[i - 1].indice + resaltados[i - 1].textoCoincidente.length;
-    
       if (resaltado.indice + resaltado.textoCoincidente.length <= anterior) {
         resaltado.indice = resaltados[i - 1].indice;
         resaltado.textoCoincidente = resaltados[i - 1].textoCoincidente;
-        return false;
-      }
-       //corregimos aquellos que parcialmente superpuestos
-
-      else if (resaltado.indice <= anterior) {
-        
-        let  comienzo=resaltado.indice-resaltados[i - 1].indice
-        
-        resaltados[i - 1].textoCoincidente = resaltados[i - 1].textoCoincidente.substring(0,comienzo)+resaltado.textoCoincidente
+      } else if (resaltado.indice <= anterior) {
+        let diferencia = resaltado.indice - resaltados[i - 1].indice;
+        resaltado.textoCoincidente = resaltados[i - 1].textoCoincidente.substring(0,diferencia) + resaltado.textoCoincidente;
         resaltado.indice = resaltados[i - 1].indice;
-        
-        console.log(resaltado.textoCoincidente)
-        return false ;
+        acc.pop();
+        acc.push(resaltado);
+      } else {
+        acc.push(resaltado);
       }
+      return acc;
+    }, []);
 
-
-
-
-      return true;
-    });
 
     
       //imprimimos la tajeta modificadas
