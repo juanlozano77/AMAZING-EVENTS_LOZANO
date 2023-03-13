@@ -114,9 +114,7 @@ const resaltarTexto=(clase,arrayTexto)=>{
     let ultimoIndice = 0
     textoTarjeta=tarjeta.textContent
     resaltados.sort((a, b) => a.indice - b.indice)//ordena los resultados
-    console.log(resaltados)
-    console.log(tarjeta.textContent)
-  
+
     
     //filtramos aquellos que esten superpuestos
     const resaltadosFiltrados = resaltados.filter((resaltado, i) => {
@@ -131,6 +129,21 @@ const resaltarTexto=(clase,arrayTexto)=>{
         resaltado.textoCoincidente = resaltados[i - 1].textoCoincidente;
         return false;
       }
+       //corregimos aquellos que parcialmente superpuestos
+
+      else if (resaltado.indice <= anterior) {
+        
+        let  comienzo=resaltado.indice-resaltados[i - 1].indice
+        
+        resaltados[i - 1].textoCoincidente = resaltados[i - 1].textoCoincidente.substring(0,comienzo)+resaltado.textoCoincidente
+        resaltado.indice = resaltados[i - 1].indice;
+        
+        console.log(resaltado.textoCoincidente)
+        return false ;
+      }
+
+
+
 
       return true;
     });
