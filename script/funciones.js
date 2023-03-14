@@ -88,6 +88,12 @@ const filtrarEventosPorTexto=(tarjetas,arrayTexto)=> {
   }
 
 
+/*La siguiente función fue creada para remarcar o resaltar el texto en las palabras que coincidan con la búsqueda 
+del inputbox. La idea es que busque los indices del comienzo del texto coindicente, después elimine las palabras que se
+superponen totalmente y modifique aquellas que se superpongan parcialmente.
+una vez modificados los indices y los textos coincidentes sin que se superongan se modifica el contenido 
+para que el texto quede remarcado y en blanco. Finalmente se reimprimen la tarjetas.*/
+
 const resaltarTexto=(clase,arrayTexto)=>{ 
   const tarjetasTexto = Array.from(document.querySelectorAll(clase));
   tarjetasTexto.forEach(tarjeta => {
@@ -121,10 +127,11 @@ const resaltarTexto=(clase,arrayTexto)=>{
         return acc;
       }
       const anterior = resaltados[i - 1].indice + resaltados[i - 1].textoCoincidente.length;
+      //elimina las palabras superpuestas totalmente
       if (resaltado.indice + resaltado.textoCoincidente.length <= anterior) {
         resaltado.indice = resaltados[i - 1].indice;
         resaltado.textoCoincidente = resaltados[i - 1].textoCoincidente;
-      } else if (resaltado.indice <= anterior) {
+      } else if (resaltado.indice <= anterior) { //modifica las palabaras superpuestas parcialmente
         let diferencia = resaltado.indice - resaltados[i - 1].indice;
         resaltado.textoCoincidente = resaltados[i - 1].textoCoincidente.substring(0,diferencia) + resaltado.textoCoincidente;
         resaltado.indice = resaltados[i - 1].indice;
@@ -135,10 +142,8 @@ const resaltarTexto=(clase,arrayTexto)=>{
       }
       return acc;
     }, []);
-
-
     
-      //imprimimos la tajeta modificadas
+      //finalmente imprimimos la tajeta modificadas
     resaltadosFiltrados.forEach(resaltado => {
       const textoAnterior =textoTarjeta.substring(ultimoIndice, resaltado.indice)
       textoResaltado += textoAnterior + `<strong class="text-white">${resaltado.textoCoincidente}</strong>`;
@@ -148,7 +153,6 @@ const resaltarTexto=(clase,arrayTexto)=>{
     textoResaltado += textoTarjeta.substring(ultimoIndice);
     tarjeta.innerHTML = `<p class="${clase}">${textoResaltado}</p>`
     
-
     }
   )
   
@@ -171,6 +175,34 @@ const filtrarEventos=(eventos,textoABuscar)=> {
   resaltarTexto(".card-title",arrayTexto)
   }
 }
+
+//Fijamos en que pagina estamos y de acuerdo a eso imprimimos las tarjetas
+const container = document.getElementById('container');
+const tituloPagina = document.title.substring(17);
+let eventosaImprimir=[]
+if (tituloPagina=="Home"){
+  eventosaImprimir=data.events
+}
+else if (tituloPagina=="UpComing Events"){
+  eventosaImprimir=data.events.filter(evento=> evento.date>data.currentDate)
+  console.log("A ver")
+}
+else if (tituloPagina=="Past Events"){
+  eventosaImprimir=data.events.filter(evento=> evento.date<data.currentDate)
+}
+
+imprimirTajetas(eventosaImprimir, container);
+let dataInput=""; 
+const input = document.getElementById('textoEvento')
+input.value="" 
+const checks = document.querySelector('#checkbar')
+checks.addEventListener('change', () => {
+  filtrarEventos(eventosaImprimir,dataInput)})
+
+input.addEventListener("keyup", (event) => {
+  dataInput = event.target.value
+  filtrarEventos(eventosaImprimir,dataInput)
+})
 
 imprimirCategorias(categorias,checkbar)
 

@@ -34,6 +34,7 @@ object-position: 50% 25%;
 #checkbar{
     display: flex;
     justify-content: center;
+    font-weight: bold;
 
   }
 #Logo{
@@ -41,6 +42,7 @@ object-position: 50% 25%;
 }
 .navbar,#carouselCaptions{
     background-color: #e6cadf;
+    font-weight: bold;
     ;
 }
 .navbar .nav-link:hover {
@@ -291,3 +293,4 @@ table thead tr th{
 .no_found{
   padding:2rem;
 }
+
