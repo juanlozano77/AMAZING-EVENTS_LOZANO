@@ -185,7 +185,6 @@ if (tituloPagina=="Home"){
 }
 else if (tituloPagina=="UpComing Events"){
   eventosaImprimir=data.events.filter(evento=> evento.date>data.currentDate)
-  console.log("A ver")
 }
 else if (tituloPagina=="Past Events"){
   eventosaImprimir=data.events.filter(evento=> evento.date<data.currentDate)
