@@ -10,16 +10,10 @@ let contenido=`
      ${evento.name}
       </strong>
     </h5>
-   <p class="card-text descripcion">Description: ${evento.description}</p>
-   <p class="card-text descripcion">Category: ${evento.category}</p>
-   <p class="card-text descripcion">Date: ${evento.date}</p>
-   <p class="card-text descripcion">Place: ${evento.place}</p>
-   <p class="card-text descripcion">Capacity: ${evento.capacity}</p>`
-   
-typeof(evento.estimate)=="number"?contenido+=`<p class="card-text descripcion">Estimate: ${evento.estimate}`
-:contenido+=`<p class="card-text descripcion">Assitance: ${evento.assistance}`
-   
-contenido+=`<p class="card-text descripcion">Price: $ ${evento.price} </p>
+    <h6 class="card-subtitle mb-2 text-muted">${evento.description}</h6>
+   <p class="card-text descripcion"><i class="bi bi-calendar-check"></i> <strong>Date:</strong>: ${evento.date}</p>
+   <p class="card-text descripcion"><i class="bi bi-geo-alt-fill"></i> <strong>Place:</strong> ${evento.place}</p>
+   <p class="card-text descripcion"><i class="bi bi-coin"></i> <strong>Price:</strong> $ ${evento.price} </p>
   </div>`
 container.innerHTML=contenido
 

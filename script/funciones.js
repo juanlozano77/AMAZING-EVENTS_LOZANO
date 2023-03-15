@@ -122,26 +122,26 @@ const resaltarTexto=(clase,arrayTexto)=>{
     resaltados.sort((a, b) => a.indice - b.indice)//ordena los resultados
 
     const resaltadosFiltrados = resaltados.reduce((acc, resaltado, i) => {
-      if (i === 0) {
-        acc.push(resaltado);
-        return acc;
+      if (i == 0) {
+        acc.push(resaltado)
+        return acc
       }
       const anterior = resaltados[i - 1].indice + resaltados[i - 1].textoCoincidente.length;
       //elimina las palabras superpuestas totalmente
       if (resaltado.indice + resaltado.textoCoincidente.length <= anterior) {
-        resaltado.indice = resaltados[i - 1].indice;
-        resaltado.textoCoincidente = resaltados[i - 1].textoCoincidente;
+        resaltado.indice = resaltados[i - 1].indice
+        resaltado.textoCoincidente = resaltados[i - 1].textoCoincidente
       } else if (resaltado.indice <= anterior) { //modifica las palabaras superpuestas parcialmente
-        let diferencia = resaltado.indice - resaltados[i - 1].indice;
+        let diferencia = resaltado.indice - resaltados[i - 1].indice
         resaltado.textoCoincidente = resaltados[i - 1].textoCoincidente.substring(0,diferencia) + resaltado.textoCoincidente;
-        resaltado.indice = resaltados[i - 1].indice;
-        acc.pop();
-        acc.push(resaltado);
+        resaltado.indice = resaltados[i - 1].indice
+        acc.pop()
+        acc.push(resaltado)
       } else {
-        acc.push(resaltado);
+        acc.push(resaltado)
       }
       return acc;
-    }, []);
+    }, [])
     
       //finalmente imprimimos la tajeta modificadas
     resaltadosFiltrados.forEach(resaltado => {
@@ -151,7 +151,7 @@ const resaltarTexto=(clase,arrayTexto)=>{
     })
 
     textoResaltado += textoTarjeta.substring(ultimoIndice);
-    tarjeta.innerHTML = `<p class="${clase}">${textoResaltado}</p>`
+    tarjeta.innerHTML = `<p class="${clase.substring(1)}"}>${textoResaltado}</p>`
     
     }
   )
