@@ -286,12 +286,15 @@ table {
 table tbody tr {
 border: 1px solid #ac6291 ;
 font-size: 13px;
+color:#292935;
+font-weight: bold;
 
 }
 
 table tbody td {
   border: 1px solid #ac6291 ;
   font-size: 13px;
+  text-align: center;
 }
 
 table thead tr th{
@@ -301,8 +304,19 @@ table thead tr th{
   background-color: #ac6291 !important;
   font-size: 16px;
   border-radius: 10px 10px 0 0;
+  color:lightyellow;
+  font-weight: bolder;
+  text-align: center;
 
 }
+
+.table_sub{
+  background-color: #ac6291;
+  text-align: center;
+  color:lightyellow;
+  font-weight: bolder;
+}
+
 
 .no_found{
   padding:2rem;
