@@ -180,36 +180,45 @@ const filtrarEventos=(eventos,textoABuscar)=> {
 //Fijamos en que pagina estamos y de acuerdo a eso imprimimos las tarjetas
 
 
-const retornarDatos = async () => {
-  const response = await fetch('https://mindhub-xj03.onrender.com/api/amazing');
-  const data = await response.json();
-  return data;
-};
-
-const cargarTarjetas= async()  => {
-  try {
-      const data = await retornarDatos();
-      console.log(data)
-      if (tituloPagina=="Home"){
-        eventosaImprimir=data.events
-      }
-      else if (tituloPagina=="UpComing Events"){
-        eventosaImprimir=data.events.filter(evento=> evento.date>data.currentDate)
-      }
-      else if (tituloPagina=="Past Events"){
-        eventosaImprimir=data.events.filter(evento=> evento.date<data.currentDate)
-      }      
-
-      const categorias = data.events.map(evento => evento.category ).filter((categoria,index,categorias)=> categorias.indexOf(categoria) == index);
-      const checkbar = document.getElementById('checkbar')
-      imprimirCategorias(categorias,checkbar)
-      imprimirTajetas(eventosaImprimir, container);
-      
-  } catch (error) {
-      console.log(error);
-      
+const cargarDatos= async()  => { 
+  const ruta = ['https://mindhub-xj03.onrender.com/api/amazing', '../assets/amazing.json'];
+  let encontrado = false;
+  let i = 0
+  let data
+  while (!encontrado && i < ruta.length) {
+    try {
+      const response = await fetch(ruta[i])
+      data = await response.json()
+      encontrado = true
+      }   
+    catch (error) {
+      console.log('Error en ruta', ruta[i], error);
+    i+=1
+    }
   }
+  if (!encontrado) {
+    console.log('Error al intertar cargarse los datos')
+    return
+  }
+  if (tituloPagina=="Home"){
+    eventosaImprimir=data.events
+  }
+  else if (tituloPagina=="UpComing Events"){
+    eventosaImprimir=data.events.filter(evento=> evento.date>data.currentDate)
+  }
+  else if (tituloPagina=="Past Events"){
+    eventosaImprimir=data.events.filter(evento=> evento.date<data.currentDate)
+  }      
+
+  const categorias = data.events.map(evento => evento.category ).filter((categoria,index,categorias)=> categorias.indexOf(categoria) == index);
+  const checkbar = document.getElementById('checkbar')
+  imprimirCategorias(categorias,checkbar)
+  imprimirTajetas(eventosaImprimir, container);
+
 }
+
+
+cargarDatos()
 
 const container = document.getElementById('container');
 const tituloPagina = document.title.substring(17);
@@ -226,7 +235,7 @@ input.addEventListener("keyup", (event) => {
   dataInput = event.target.value
   filtrarEventos(eventosaImprimir,dataInput)  
 })
-cargarTarjetas()
+
 
 
 

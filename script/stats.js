@@ -1,91 +1,173 @@
-const retornarDatos = async () => {
-    const response = await fetch('https://mindhub-xj03.onrender.com/api/amazing');
-    const data = await response.json();
-    return data;
+let data
+let past
+let upcoming  
+let datosPasado
+let datosFuturo
+let tablaPast
+let tablaUpcoming
+const cargarTablas= async()  => {
+  const ruta = ['https://mindhub-xj03.onrender.com/api/amazing', '../assets/amazing.json'];
+  let encontrado = false;
+  let i = 0
+  while (!encontrado && i < ruta.length) {
+    try {
+      const response = await fetch(ruta[i])
+      data = await response.json()
+      encontrado = true
+      }   
+    catch (error) {
+      console.log('Error en ruta', ruta[i], error);
+    i+=1
+    }
   }
   
-  const cargarDescripcion= async()  => {
-    let eventoMayorCapacidad
-    try {
-        const data = await retornarDatos();
-      
-        let MayorCapacidad=0
-        data.events.forEach(evento => {
-            let asistencia_o_estimado=""
-            asistencia_o_estimado=typeof(evento.estimate)=="number"?"estimate":"assistance"
-            evento.porcentajeAsistencia = (evento[asistencia_o_estimado] / evento.capacity) 
-            evento.ganancia=evento.price*evento[asistencia_o_estimado]
-            if (evento.capacity>MayorCapacidad){
-                eventoMayorCapacidad=evento
-                MayorCapacidad=evento.capacity
+  past=data.events.filter(evento=> evento.date<data.currentDate)
+  agregarPorcentajeyGanancia(past,'assistance')
+  upcoming=data.events.filter(evento=> evento.date>data.currentDate)
+  agregarPorcentajeyGanancia(upcoming,'estimate')
 
-            }
-          
-        });
-    const upcoming=data.events.filter(evento=> evento.date>data.currentDate)
-    console.log(upcoming)
-    const past=data.events.filter(evento=> evento.date<data.currentDate)
-    let result = totalesPorCategoria(upcoming);
-    const tablaUpcoming = document.getElementById('t_upcoming')
-    rellenarFila(tablaUpcoming,result)
-    result = totalesPorCategoria(past);
-    const tablaPast = document.getElementById('t_past')
-    result=totalesPorCategoria(past);
-    rellenarFila(tablaPast,result)
-    past.sort((a, b) => a.porcentajeAsistencia - b.porcentajeAsistencia);
-    const eventoMayorAsistencia=past[past.length-1]
-    const eventoMenorAsistencia=past[0]
-    const tablaEventos=document.getElementById('t_events')
-    
-    tablaEventos.innerHTML+=`
-    <tr><td>${eventoMayorAsistencia.name}: ${eventoMayorAsistencia.porcentajeAsistencia.toLocaleString('es-ES', {style:'percent', minimumFractionDigits: 2 })} </td>
-    <td>${eventoMenorAsistencia.name}: ${eventoMenorAsistencia.porcentajeAsistencia.toLocaleString('es-ES', {style:'percent', minimumFractionDigits: 2 })} </td>
-    <td>${eventoMayorCapacidad.name}: ${eventoMayorCapacidad.capacity}
-    </td></tr>`
-    
-    
+  datosFuturo =Object.values(totalesPorCategoria(upcoming,'estimate'));
+  tablaUpcoming = document.getElementById('t_upcoming')
+  rellenarFila(tablaUpcoming,datosFuturo)
+  
+  datosPasado = Object.values(totalesPorCategoria(past,'assistance'));
+  tablaPast = document.getElementById('t_past')
+  rellenarFila(tablaPast,datosPasado)
+  
+  rellenarTablaEventos(past)
+ 
+} 
 
-    
-    } catch (error) {
-        console.log(error);
+const totalesPorCategoria = (eventos, asistanceOrEstimate) => {
+   return eventos.reduce((totales, event) => {
+    let categoria = event.category;
+    let capacidad = event.capacity;
+    let asistencia = event[asistanceOrEstimate];
+    let ganancia = event.ganancia;
+    if (!(categoria in totales)) {
+      totales[categoria] = {
+        categoria: categoria,
+        capacidadTotal: capacidad,
+        asistenciaTotal: asistencia,
+        total: ganancia
+      };
+    } else {
+      totales[categoria].capacidadTotal += capacidad;
+      totales[categoria].asistenciaTotal += asistencia;
+      totales[categoria].total += ganancia;
     }
-}
-
-
-const totalesPorCategoria = (eventos) => {
-    return eventos.reduce((totals, event) => {
-      const { category } = event;
-      let total = event.ganancia;
-      let asistenciaTotal =typeof(event.estimate)=="number"?event.estimate:event.assistance
-      let capacidadTotal=event.capacity
-  
-      if (!totals[category]) {
-        totals[category] = {
-          total,
-          asistenciaTotal,
-          capacidadTotal
-
-        };
-      } else {
-        totals[category].total += total;
-        totals[category].asistenciaTotal += asistenciaTotal;
-        totals[category].capacidadTotal += capacidadTotal;
-        
-      }
-  
-      return totals;
-    }, {});
+    return totales;
+  }, {});
   };
-  
-  const rellenarFila=(tabla,result)=>{ for (let category in result) {
-    let contenido=`<tr><td>${category}</td>
-    <td>${result[category].total.toLocaleString('es-ES', {style:'currency', currency: 'USD'})}</td>
-    <td>${(result[category].asistenciaTotal/result[category].capacidadTotal*100).toFixed(2).replace(".",",")}%
-    </td></tr>`
-    tabla.innerHTML+=contenido
-    }
+
+ 
+
+const rellenarFila=(tabla,result)=>{ for (let category in result) {
+  let contenido=`<tr><td>${result[category].categoria}</td>
+  <td>${result[category].total.toLocaleString('es-ES', {style:'currency', currency: 'USD'})}</td>
+  <td>${(result[category].asistenciaTotal/result[category].capacidadTotal*100).toFixed(2).replace(".",",")}%
+  </td></tr>`
+  tabla.innerHTML+=contenido
+  }
 }
-    
+
+const hallarExtremos = (array, propiedad,esMinimo=false) => array.reduce((acc, curr,index) => {
+  if (esMinimo?curr[propiedad] < acc[0][propiedad]:curr[propiedad] > acc[0][propiedad]) {
+    return [curr];
+  } else if (curr[propiedad] == acc[0][propiedad] && index!=0) {
+    acc.push(curr);
+  }
+  return acc;
+}, [array[0]]);
 
 
- cargarDescripcion()
+const agregarPorcentajeyGanancia=(array,propiedad)=>(array.forEach(evento => {
+  evento.porcentajeAsistencia = (evento[propiedad]/ evento.capacity) 
+  evento.ganancia=evento.price*evento[propiedad]
+}));
+
+
+const rellenarTablaEventos=(array)=>{ 
+  const eventoMayorCapacidad=hallarExtremos(array,'capacity')  
+  const eventoMayorAsistencia=hallarExtremos(array,'porcentajeAsistencia')
+  const eventoMenorAsistencia=hallarExtremos(array,'porcentajeAsistencia',true)
+  
+  const tablaEventos=document.getElementById('t_events')
+  
+  let mayor = Math.max(eventoMenorAsistencia.length, eventoMayorAsistencia.length, eventoMayorCapacidad.length);  
+  
+
+  for (let i = 0; i < mayor; i++) {
+    const { name: mayorAsistenciaName, porcentajeAsistencia: mayorAsistenciaPorcentaje } = eventoMayorAsistencia[i] || {};
+    const { name: menorAsistenciaName, porcentajeAsistencia: menorAsistenciaPorcentaje } = eventoMenorAsistencia[i] || {};
+    const { name: mayorCapacidadName, capacity: mayorCapacidadValue } = eventoMayorCapacidad[i] || {};
+  
+    const mayorAsistencia = mayorAsistenciaName ? `${mayorAsistenciaName}: ${mayorAsistenciaPorcentaje.toLocaleString('es-ES', {style: 'percent', minimumFractionDigits: 2})}` : '';
+    const menorAsistencia = menorAsistenciaName ? `${menorAsistenciaName}: ${menorAsistenciaPorcentaje.toLocaleString('es-ES', {style: 'percent', minimumFractionDigits: 2})}` : '';
+    const mayorCapacidad = mayorCapacidadName ? `${mayorCapacidadName}: ${mayorCapacidadValue}` : '';
+  
+    tablaEventos.innerHTML+=`<tr><td>${mayorAsistencia}</td><td>${menorAsistencia}</td><td>${mayorCapacidad}</td></tr>`
+  }
+}
+
+cargarTablas()
+
+const ascButton = document.querySelectorAll(".flechas");
+ascButton.forEach((elemento) => {
+  elemento.addEventListener('click', () => {
+    console.log(elemento.className) 
+    const categoria = elemento.parentNode.textContent.trim(); 
+    const tabla=elemento.parentNode.parentNode.parentNode.parentNode
+    console.log(categoria);
+    console.log(tabla.id);
+    ordenarTabla(elemento.className,categoria,tabla.id)
+})}); 
+
+
+const ordenarTabla=(clase,categoria,tabla) =>{
+  let menorAMayor=1
+  if (clase=="bi bi-caret-up-fill flechas"){
+    menorAMayor=-1
+  }
+  if (tabla=="past"){
+    tabla=tablaPast
+    datos=datosPasado
+  }
+  else {
+    tabla=tablaUpcoming
+    datos=datosFuturo
+  }
+  if (categoria=="Categories"){
+    propiedad='categoria'}
+  else if(categoria=='Revenues'){
+    propiedad='total'
+  }
+  else if (categoria=="Percentage of attendance")
+  {
+    propiedad=(data) => data.asistenciaTotal / data.capacidadTotal;
+  }
+
+   console.log(menorAMayor)
+   console.log(propiedad)
+   console.log(tabla)
+  
+    datos.sort((a, b) => {
+      const valorA = typeof propiedad == "function" ? propiedad(a) : a[propiedad];
+      const valorB = typeof propiedad == "function" ? propiedad(b) : b[propiedad];
+      if (valorA < valorB) return menorAMayor;
+      if (valorA > valorB) return -menorAMayor;
+      return 0;    
+    });
+  tabla.innerHTML=""
+  rellenarFila(tabla,datos)
+}
+
+
+
+
+
+
+
+
+
+

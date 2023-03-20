@@ -335,3 +335,33 @@ table thead tr th{
 #body_details{
   background-color: #e6cadf;
 }
+
+
+.flechas {
+  cursor: pointer;
+  margin-left: 5px;
+  align-content: flex-end;
+}
+
+
+
+/*
+.table tbody tr td i.bi-caret-up-fill {
+  display: none;
+}
+
+table tbody tr td.asc i.bi-caret-up-fill {
+  display: inline-block;
+}
+
+table tbody tr td.asc i.bi-caret-down-fill {
+  display: none;
+}
+
+table tbody tr td.desc i.bi-caret-up-fill {
+  display: none;
+}
+
+table tbody tr td.desc i.bi-caret-down-fill {
+  display: inline-block;
+}*/
