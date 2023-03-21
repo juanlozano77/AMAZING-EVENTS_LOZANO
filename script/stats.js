@@ -1,14 +1,8 @@
-let data
-let past
-let upcoming  
-let datosPasado
-let datosFuturo
-let tablaPast
-let tablaUpcoming
 const cargarTablas= async()  => {
   const ruta = ['https://mindhub-xj03.onrender.com/api/amazing', '../assets/amazing.json'];
   let encontrado = false;
   let i = 0
+  let data
   while (!encontrado && i < ruta.length) {
     try {
       const response = await fetch(ruta[i])
@@ -21,21 +15,40 @@ const cargarTablas= async()  => {
     }
   }
   
-  past=data.events.filter(evento=> evento.date<data.currentDate)
+  const past=data.events.filter(evento=> evento.date<data.currentDate)
   agregarPorcentajeyGanancia(past,'assistance')
-  upcoming=data.events.filter(evento=> evento.date>data.currentDate)
+  const upcoming=data.events.filter(evento=> evento.date>data.currentDate)
   agregarPorcentajeyGanancia(upcoming,'estimate')
 
-  datosFuturo =Object.values(totalesPorCategoria(upcoming,'estimate'));
-  tablaUpcoming = document.getElementById('t_upcoming')
+  const datosFuturo =Object.values(totalesPorCategoria(upcoming,'estimate'));
+  const tablaUpcoming = document.getElementById('t_upcoming')
   rellenarFila(tablaUpcoming,datosFuturo)
   
-  datosPasado = Object.values(totalesPorCategoria(past,'assistance'));
-  tablaPast = document.getElementById('t_past')
+  const datosPasado = Object.values(totalesPorCategoria(past,'assistance'));
+  const tablaPast = document.getElementById('t_past')
   rellenarFila(tablaPast,datosPasado)
   
   rellenarTablaEventos(past)
- 
+
+  const flechasOrdenar = document.querySelectorAll(".flechas");
+  flechasOrdenar.forEach((elemento) => {
+    elemento.addEventListener('click', () => {
+      const encabezado = elemento.parentNode.textContent.trim(); 
+      const tabla=elemento.parentNode.parentNode.parentNode.parentNode
+      let table
+      let datos
+      if (tabla.id=="past"){
+        table=tablaPast
+        datos=datosPasado
+      }
+      else {
+        table=tablaUpcoming
+        datos=datosFuturo
+      }
+    ordenarTabla(elemento.className,encabezado,table,datos)
+})}); 
+
+
 } 
 
 const totalesPorCategoria = (eventos, asistanceOrEstimate) => {
@@ -110,30 +123,12 @@ const rellenarTablaEventos=(array)=>{
   }
 }
 
-cargarTablas()
-
-const flechasOrdenar = document.querySelectorAll(".flechas");
-flechasOrdenar.forEach((elemento) => {
-  elemento.addEventListener('click', () => {
-    const encabezado = elemento.parentNode.textContent.trim(); 
-    const tabla=elemento.parentNode.parentNode.parentNode.parentNode
-    ordenarTabla(elemento.className,encabezado,tabla.id)
-})}); 
-
-
-const ordenarTabla=(clase,encabezado,tabla) =>{
+const ordenarTabla=(clase,encabezado,tabla,datos) =>{
   let ordenAscendente=1
   if (clase=="bi bi-caret-up-fill flechas"){
     ordenAscendente=-1
   }
-  if (tabla=="past"){
-    tabla=tablaPast
-    datos=datosPasado
-  }
-  else {
-    tabla=tablaUpcoming
-    datos=datosFuturo
-  }
+  
   if (encabezado=="Categories"){
     propiedad='categoria'}
   else if(encabezado=='Revenues'){
@@ -158,7 +153,7 @@ const ordenarTabla=(clase,encabezado,tabla) =>{
   rellenarFila(tabla,datos)
 }
 
-
+cargarTablas()
 
 
 

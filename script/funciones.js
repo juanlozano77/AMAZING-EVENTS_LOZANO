@@ -1,3 +1,57 @@
+const cargarDatos= async()  => { 
+  const ruta = ['https://mindhub-xj03.onrender.com/api/amazing', '../assets/amazing.json'];
+  let encontrado = false;
+  let i = 0
+  let data
+  while (!encontrado && i < ruta.length) {
+    try {
+      const response = await fetch(ruta[i])
+      data = await response.json()
+      encontrado = true
+      }   
+    catch (error) {
+      console.log('Error en ruta', ruta[i], error);
+    i+=1
+    }
+  }
+  if (!encontrado) {
+    console.log('Error al intertar cargarse los datos')
+    return
+  }
+  const tituloPagina = document.title.substring(17);
+  let eventosaImprimir=[]
+  let dataInput=""; //Para que cuando refresque la pagina se ponga en blanco el inputbox
+  
+  if (tituloPagina=="Home"){
+    eventosaImprimir=data.events
+  }
+  else if (tituloPagina=="UpComing Events"){
+    eventosaImprimir=data.events.filter(evento=> evento.date>data.currentDate)
+  }
+  else if (tituloPagina=="Past Events"){
+    eventosaImprimir=data.events.filter(evento=> evento.date<data.currentDate)
+  }      
+
+  const categorias = data.events.map(evento => evento.category ).filter((categoria,index,categorias)=> categorias.indexOf(categoria) == index);
+  const checkbar = document.getElementById('checkbar')
+  imprimirCategorias(categorias,checkbar)
+  imprimirTajetas(eventosaImprimir, container);
+ 
+  const input = document.getElementById('textoEvento')
+  input.value="" ;//En el caso de que resfreque la pagina
+  const checks = document.querySelector('#checkbar')
+
+  checks.addEventListener('change', () => {
+  filtrarEventos(eventosaImprimir,dataInput)})
+
+  input.addEventListener("keyup", (event) => {
+  dataInput = event.target.value
+  filtrarEventos(eventosaImprimir,dataInput)  
+})
+
+}
+
+
 const rellenarTarjeta=(evento)=>{
     return `
     <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 d-flex justify-content-center">
@@ -44,6 +98,7 @@ const clickEnTarjeta=()=> {
     })
   })
 }  
+
 const imprimirTajetas=(eventosaImprimir, contenedor)=>{
   contenedor.innerHTML = ""
   let contenido=eventosaImprimir.reduce((ant,evento)=> {
@@ -82,7 +137,7 @@ const filtrarEventosPorTexto=(tarjetas,arrayTexto)=> {
     return coinciden;
   })
   return tarjetasconTexto;
-  }
+}
 
 
 /*La siguiente función fue creada para remarcar o resaltar el texto en las palabras que coincidan con la búsqueda 
@@ -174,59 +229,6 @@ const filtrarEventos=(eventos,textoABuscar)=> {
   }
 }
 
-//Fijamos en que pagina estamos y de acuerdo a eso imprimimos las tarjetas
-
-const cargarDatos= async()  => { 
-  const ruta = ['https://mindhub-xj03.onrender.com/api/amazing', '../assets/amazing.json'];
-  let encontrado = false;
-  let i = 0
-  let data
-  while (!encontrado && i < ruta.length) {
-    try {
-      const response = await fetch(ruta[i])
-      data = await response.json()
-      encontrado = true
-      }   
-    catch (error) {
-      console.log('Error en ruta', ruta[i], error);
-    i+=1
-    }
-  }
-  if (!encontrado) {
-    console.log('Error al intertar cargarse los datos')
-    return
-  }
-  if (tituloPagina=="Home"){
-    eventosaImprimir=data.events
-  }
-  else if (tituloPagina=="UpComing Events"){
-    eventosaImprimir=data.events.filter(evento=> evento.date>data.currentDate)
-  }
-  else if (tituloPagina=="Past Events"){
-    eventosaImprimir=data.events.filter(evento=> evento.date<data.currentDate)
-  }      
-
-  const categorias = data.events.map(evento => evento.category ).filter((categoria,index,categorias)=> categorias.indexOf(categoria) == index);
-  const checkbar = document.getElementById('checkbar')
-  imprimirCategorias(categorias,checkbar)
-  imprimirTajetas(eventosaImprimir, container);
-
-}
-
 cargarDatos()
 
-const container = document.getElementById('container');
-const tituloPagina = document.title.substring(17);
-let eventosaImprimir=[]
-let dataInput=""; //Para que cuando refresque la pagina se ponga en blanco el inputbox
-const input = document.getElementById('textoEvento')
-input.value="" ;//En el caso de que resfreque la pagina
-const checks = document.querySelector('#checkbar')
 
-checks.addEventListener('change', () => {
-  filtrarEventos(eventosaImprimir,dataInput)})
-
-input.addEventListener("keyup", (event) => {
-  dataInput = event.target.value
-  filtrarEventos(eventosaImprimir,dataInput)  
-})

@@ -188,7 +188,9 @@ main{
     font-size: 1.5rem;
     font-weight: 700;
 }
-
+.form{
+  min-height: calc(100vh - 391.85px);
+}
 
 
   
@@ -304,18 +306,28 @@ table thead tr th{
  
   background-color: #ac6291 !important;
   font-size: 16px;
-  border-radius: 10px 10px 0 0;
+  border-radius: 10px 10px 0px 0px;
   color:lightyellow;
   font-weight: bolder;
   text-align: center;
 
 }
 
+table thead tr:last-child th {
+  border-radius: 0px 0px 0px 0px;
+}
+table thead tr:first-child th {
+  border-radius: 10px 10px 0px 0px;
+}
+
+
+
 .table_sub{
   background-color: #ac6291;
   text-align: center;
   color:lightyellow;
   font-weight: bolder;
+  border-radius: 10px 10px 0px 0px ;
 }
 
 
@@ -341,5 +353,16 @@ table thead tr th{
 .flechas {
   cursor: pointer;
   margin-left: 5px;
-  align-content: flex-end;
+  margin-right: 5px;
+  
+}
+
+
+@media (max-width: 690px) {
+ 
+  .flechas {
+    display: grid;
+    margin: 5px auto;
+  }
+  
 }
