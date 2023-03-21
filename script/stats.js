@@ -39,7 +39,7 @@ const cargarTablas= async()  => {
 } 
 
 const totalesPorCategoria = (eventos, asistanceOrEstimate) => {
-   return eventos.reduce((totales, event) => {
+   return Object.values(eventos.reduce((totales, event) => {
     let categoria = event.category;
     let capacidad = event.capacity;
     let asistencia = event[asistanceOrEstimate];
@@ -57,7 +57,7 @@ const totalesPorCategoria = (eventos, asistanceOrEstimate) => {
       totales[categoria].total += ganancia;
     }
     return totales;
-  }, {});
+  }, {}));
   };
 
  
@@ -96,38 +96,35 @@ const rellenarTablaEventos=(array)=>{
   
   let mayor = Math.max(eventoMenorAsistencia.length, eventoMayorAsistencia.length, eventoMayorCapacidad.length);  
   
-
+  
   for (let i = 0; i < mayor; i++) {
-    const { name: mayorAsistenciaName, porcentajeAsistencia: mayorAsistenciaPorcentaje } = eventoMayorAsistencia[i] || {};
-    const { name: menorAsistenciaName, porcentajeAsistencia: menorAsistenciaPorcentaje } = eventoMenorAsistencia[i] || {};
-    const { name: mayorCapacidadName, capacity: mayorCapacidadValue } = eventoMayorCapacidad[i] || {};
-  
-    const mayorAsistencia = mayorAsistenciaName ? `${mayorAsistenciaName}: ${mayorAsistenciaPorcentaje.toLocaleString('es-ES', {style: 'percent', minimumFractionDigits: 2})}` : '';
-    const menorAsistencia = menorAsistenciaName ? `${menorAsistenciaName}: ${menorAsistenciaPorcentaje.toLocaleString('es-ES', {style: 'percent', minimumFractionDigits: 2})}` : '';
-    const mayorCapacidad = mayorCapacidadName ? `${mayorCapacidadName}: ${mayorCapacidadValue}` : '';
-  
-    tablaEventos.innerHTML+=`<tr><td>${mayorAsistencia}</td><td>${menorAsistencia}</td><td>${mayorCapacidad}</td></tr>`
+      
+    tablaEventos.innerHTML+=`
+    <tr>
+    <td>${i < eventoMayorAsistencia.length ? eventoMayorAsistencia[i].name + ': ' + eventoMayorAsistencia[i].porcentajeAsistencia.toLocaleString('es-ES', { style: 'percent', minimumFractionDigits: 2 }) : ''}</td>
+    <td>${i < eventoMenorAsistencia.length ? eventoMenorAsistencia[i].name + ': ' + eventoMenorAsistencia[i].porcentajeAsistencia.toLocaleString('es-ES', { style: 'percent', minimumFractionDigits: 2 }) : ''}</td>
+    <td>${i < eventoMayorCapacidad.length ? eventoMayorCapacidad[i].name + ': ' + eventoMayorCapacidad[i].capacity : ''}</td>
+    </tr>`;
+    
+
   }
 }
 
 cargarTablas()
 
-const ascButton = document.querySelectorAll(".flechas");
-ascButton.forEach((elemento) => {
+const flechasOrdenar = document.querySelectorAll(".flechas");
+flechasOrdenar.forEach((elemento) => {
   elemento.addEventListener('click', () => {
-    console.log(elemento.className) 
-    const categoria = elemento.parentNode.textContent.trim(); 
+    const encabezado = elemento.parentNode.textContent.trim(); 
     const tabla=elemento.parentNode.parentNode.parentNode.parentNode
-    console.log(categoria);
-    console.log(tabla.id);
-    ordenarTabla(elemento.className,categoria,tabla.id)
+    ordenarTabla(elemento.className,encabezado,tabla.id)
 })}); 
 
 
-const ordenarTabla=(clase,categoria,tabla) =>{
-  let menorAMayor=1
+const ordenarTabla=(clase,encabezado,tabla) =>{
+  let ordenAscendente=1
   if (clase=="bi bi-caret-up-fill flechas"){
-    menorAMayor=-1
+    ordenAscendente=-1
   }
   if (tabla=="past"){
     tabla=tablaPast
@@ -137,27 +134,26 @@ const ordenarTabla=(clase,categoria,tabla) =>{
     tabla=tablaUpcoming
     datos=datosFuturo
   }
-  if (categoria=="Categories"){
+  if (encabezado=="Categories"){
     propiedad='categoria'}
-  else if(categoria=='Revenues'){
+  else if(encabezado=='Revenues'){
     propiedad='total'
   }
-  else if (categoria=="Percentage of attendance")
+  else if (encabezado=="Percentage of attendance")
   {
     propiedad=(data) => data.asistenciaTotal / data.capacidadTotal;
   }
-
-   console.log(menorAMayor)
-   console.log(propiedad)
-   console.log(tabla)
   
-    datos.sort((a, b) => {
-      const valorA = typeof propiedad == "function" ? propiedad(a) : a[propiedad];
-      const valorB = typeof propiedad == "function" ? propiedad(b) : b[propiedad];
-      if (valorA < valorB) return menorAMayor;
-      if (valorA > valorB) return -menorAMayor;
-      return 0;    
-    });
+  datos.sort((a, b) => {
+  const valorA = typeof propiedad == "function" ? propiedad(a) : a[propiedad];
+  const valorB = typeof propiedad == "function" ? propiedad(b) : b[propiedad];
+  if (valorA < valorB) 
+    {return ordenAscendente}
+  else if (valorA > valorB) 
+    {return -ordenAscendente}
+  else
+    {return 0}    
+  });
   tabla.innerHTML=""
   rellenarFila(tabla,datos)
 }

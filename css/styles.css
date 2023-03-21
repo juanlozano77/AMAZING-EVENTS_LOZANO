@@ -211,6 +211,7 @@ max-width: 55%;
 }
 .body_details .card-title,.body_details .card-subtitle{
   padding:0.5rem;
+  background-color: #e6cadf;
 
 }
 
@@ -342,26 +343,3 @@ table thead tr th{
   margin-left: 5px;
   align-content: flex-end;
 }
-
-
-
-/*
-.table tbody tr td i.bi-caret-up-fill {
-  display: none;
-}
-
-table tbody tr td.asc i.bi-caret-up-fill {
-  display: inline-block;
-}
-
-table tbody tr td.asc i.bi-caret-down-fill {
-  display: none;
-}
-
-table tbody tr td.desc i.bi-caret-up-fill {
-  display: none;
-}
-
-table tbody tr td.desc i.bi-caret-down-fill {
-  display: inline-block;
-}*/
