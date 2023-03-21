@@ -159,8 +159,6 @@ const resaltarTexto=(clases,arrayTexto)=>{
   
 }
 
-
-
 const filtrarEventos=(eventos,textoABuscar)=> {
   const tildados = obtenerCheckboxTildados()
   const texto = textoABuscar.trim().toLowerCase()
@@ -178,7 +176,6 @@ const filtrarEventos=(eventos,textoABuscar)=> {
 }
 
 //Fijamos en que pagina estamos y de acuerdo a eso imprimimos las tarjetas
-
 
 const cargarDatos= async()  => { 
   const ruta = ['https://mindhub-xj03.onrender.com/api/amazing', '../assets/amazing.json'];
@@ -217,7 +214,6 @@ const cargarDatos= async()  => {
 
 }
 
-
 cargarDatos()
 
 const container = document.getElementById('container');
@@ -235,28 +231,3 @@ input.addEventListener("keyup", (event) => {
   dataInput = event.target.value
   filtrarEventos(eventosaImprimir,dataInput)  
 })
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*const fetchData = () => {
-  return new Promise((resolve, reject) => {
-    fetch('https://ejemplo.com/data')
-      .then(response => response.json())
-      .then(data => resolve(data))
-      .catch(error => reject(error));
-  });
-};
-
-fetchData()
-  .then(data => console.log(data))
-  .catch(error => console.error(error));*/
